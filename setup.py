@@ -5,9 +5,9 @@ from version import get_version
 
 version = get_version()
 
-setup(name='gs.auth.oauth.facebook',
+setup(name='gs.auth.oauth.client',
     version=version,
-    description="outh2 facebook registration methods",
+    description="outh2 client registration methods",
     long_description=open("README.txt").read() + "\n" +
                     open(os.path.join("docs", "HISTORY.txt")).read(),
     classifiers=[
@@ -21,7 +21,7 @@ setup(name='gs.auth.oauth.facebook',
       "Programming Language :: Python",
       "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    keywords='outh2, facebook, registration',
+    keywords='outh2, client, registration',
     author='Richard Waid',
     author_email='richard@onlinegroups.net',
     url='http://groupserver.org',
@@ -38,4 +38,3 @@ setup(name='gs.auth.oauth.facebook',
     # -*- Entry points: -*-
     """,
 )
-
