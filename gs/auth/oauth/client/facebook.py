@@ -2,6 +2,7 @@
 import cgi
 import urllib
 import simplejson
+import base64
 
 FACEBOOK_SERVER = "graph.facebook.com"
 FACEBOOK_AUTHORIZATION_URI = "https://%s/oauth/authorize" % FACEBOOK_SERVER
@@ -16,12 +17,19 @@ def auth_url(redirect_uri, client_id, scope=('email',)):
               'client_id': client_id,
               'scope': ','.join(scope)}
         
-    return FACEBOOK_AUTHORIZATION_URI+'?'+urllib.urlencode(args)
+    return FACEBOOK_AUTHORIZATION_URI+'?'+urllib.urlencode(params)
+
+def encode_parameters(params):
+    return base64.urlsafe_b64encode(urllib.urlencode(params))
+
+def decode_parameters(s):
+    return base64.urlsafe_b64decode(s)
 
 class FacebookAuth:
-    def __init__(self, redirect_uri, client_id, scope=('email',)):
+    def __init__(self, redirect_uri, client_id, client_secret, scope=('email',)):
         self.redirect_uri = redirect_uri
-        self.client_id = client_id,
+        self.client_id = client_id
+        self.client_secret = client_secret
         self.scope = scope
 
     def complete_auth(self, request):
@@ -29,11 +37,11 @@ class FacebookAuth:
 
         """
         self.access_token = None
-        if 'code' in self.request:
+        if 'code' in request:
             params = {'redirect_uri': self.redirect_uri,
                       'client_id': self.client_id,
-                      'scope': ','.join(self.scope),
-                      'code': self.request['code']}
+                      'client_secret': self.client_secret,
+                      'code': request['code']}
 
             url = FACEBOOK_ACCESS_TOKEN_URI+'?'+urllib.urlencode(params)
             response = cgi.parse_qs(urllib.urlopen(url).read())
@@ -46,5 +54,3 @@ class FacebookAuth:
         params = {'access_token': self.access_token}
         url = FACEBOOK_CHECK_AUTH+'?'+urllib.urlencode(params)
         return simplejson.load(urllib.urlopen(url))      
-
-   
