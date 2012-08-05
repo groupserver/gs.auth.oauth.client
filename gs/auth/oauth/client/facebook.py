@@ -3,6 +3,8 @@ import cgi
 import urllib
 import simplejson
 import base64
+import logging
+log = logging.getLogger("gs.auth.oauth.client")
 
 FACEBOOK_SERVER = "graph.facebook.com"
 FACEBOOK_AUTHORIZATION_URI = "https://%s/oauth/authorize" % FACEBOOK_SERVER
@@ -46,11 +48,13 @@ class FacebookAuth:
             url = FACEBOOK_ACCESS_TOKEN_URI+'?'+urllib.urlencode(params)
             response = cgi.parse_qs(urllib.urlopen(url).read())
             self.access_token = response['access_token'][0]
-    
+            log.info('Received access token from facebook')
+ 
     def data(self):
         """ Retrieve user data from service.
         
         """
         params = {'access_token': self.access_token}
         url = FACEBOOK_CHECK_AUTH+'?'+urllib.urlencode(params)
-        return simplejson.load(urllib.urlopen(url))      
+        userdata = simplejson.load(urllib.urlopen(url))
+        log.info('Received user data from facebook: %s' % data)
