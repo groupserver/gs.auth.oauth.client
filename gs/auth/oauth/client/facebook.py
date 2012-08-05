@@ -47,9 +47,12 @@ class FacebookAuth:
 
             url = FACEBOOK_ACCESS_TOKEN_URI+'?'+urllib.urlencode(params)
             response = cgi.parse_qs(urllib.urlopen(url).read())
-            self.access_token = response['access_token'][0]
-            log.info('Received access token from facebook')
- 
+            try:
+                self.access_token = response['access_token'][0]
+                log.info('Received access token from facebook')
+            except KeyError:
+                log.error('Did not receive access token from facebook, instead: %s' % response) 
+
     def data(self):
         """ Retrieve user data from service.
         
