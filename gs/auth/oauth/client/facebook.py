@@ -60,4 +60,4 @@ class FacebookAuth:
         params = {'access_token': self.access_token}
         url = FACEBOOK_CHECK_AUTH+'?'+urllib.urlencode(params)
         userdata = simplejson.load(urllib.urlopen(url))
-        log.info('Received user data from facebook: %s' % data)
+        log.info('Received user data from facebook: %s' % userdata)
