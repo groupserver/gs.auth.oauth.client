@@ -1,10 +1,32 @@
+# -*- coding: utf-8 -*-
+############################################################################
+#
+# Copyright © 2011, 2012, 2013, 2014, 2015 E-Democracy.org and
+# Contributors.
+#
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+############################################################################
 # Partially borrowed from django_social_auth
-import cgi
-import urllib
-import simplejson
+from __future__ import absolute_import, unicode_literals, print_function, division
 import base64
-import logging
-log = logging.getLogger("gs.auth.oauth.client")
+import cgi
+from logging import getLogger
+log = getLogger("gs.auth.oauth.client")
+import sys
+if sys.version_info >= (3, ):
+    from urllib.parse import urlencode
+    from urllib.request import urlopen
+else:  # Python 2
+    from urllib import urlencode, urlopen
+import simplejson
 
 FACEBOOK_SERVER = "graph.facebook.com"
 FACEBOOK_AUTHORIZATION_URI = "https://%s/oauth/authorize" % FACEBOOK_SERVER
@@ -19,12 +41,12 @@ def auth_url(redirect_uri, client_id, scope=('email',)):
     params = {'redirect_uri': redirect_uri,
               'client_id': client_id,
               'scope': ','.join(scope)}
-
-    return FACEBOOK_AUTHORIZATION_URI+'?'+urllib.urlencode(params)
+    retval = '{uri}?{params}'.format(uri=FACEBOOK_AUTHORIZATION_URI, params=urlencode(params))
+    return retval
 
 
 def encode_parameters(params):
-    return base64.urlsafe_b64encode(urllib.urlencode(params))
+    return base64.urlsafe_b64encode(urlencode(params))
 
 
 def decode_parameters(s):
@@ -49,8 +71,8 @@ class FacebookAuth:
                       'client_secret': self.client_secret,
                       'code': request['code']}
 
-            url = FACEBOOK_ACCESS_TOKEN_URI+'?'+urllib.urlencode(params)
-            response = cgi.parse_qs(urllib.urlopen(url).read())
+            url = FACEBOOK_ACCESS_TOKEN_URI+'?'+urlencode(params)
+            response = cgi.parse_qs(urlopen(url).read())
             try:
                 self.access_token = response['access_token'][0]
                 log.info('Received access token from facebook')
@@ -60,7 +82,7 @@ class FacebookAuth:
     def data(self):
         """ Retrieve user data from service."""
         params = {'access_token': self.access_token}
-        url = FACEBOOK_CHECK_AUTH+'?'+urllib.urlencode(params)
-        userdata = simplejson.load(urllib.urlopen(url))
+        url = FACEBOOK_CHECK_AUTH+'?'+urlencode(params)
+        userdata = simplejson.load(urlopen(url))
         log.info('Received user data from facebook: %s' % userdata)
         return userdata
