@@ -11,6 +11,7 @@ FACEBOOK_AUTHORIZATION_URI = "https://%s/oauth/authorize" % FACEBOOK_SERVER
 FACEBOOK_ACCESS_TOKEN_URI = "https://%s/oauth/access_token" % FACEBOOK_SERVER
 FACEBOOK_CHECK_AUTH = "https://%s/me" % FACEBOOK_SERVER
 
+
 def auth_url(redirect_uri, client_id, scope=('email',)):
     """ Return URL which will initiate oauth authentication.
 
@@ -18,14 +19,17 @@ def auth_url(redirect_uri, client_id, scope=('email',)):
     params = {'redirect_uri': redirect_uri,
               'client_id': client_id,
               'scope': ','.join(scope)}
-        
+
     return FACEBOOK_AUTHORIZATION_URI+'?'+urllib.urlencode(params)
+
 
 def encode_parameters(params):
     return base64.urlsafe_b64encode(urllib.urlencode(params))
 
+
 def decode_parameters(s):
     return base64.urlsafe_b64decode(s)
+
 
 class FacebookAuth:
     def __init__(self, redirect_uri, client_id, client_secret, scope=('email',)):
@@ -51,12 +55,10 @@ class FacebookAuth:
                 self.access_token = response['access_token'][0]
                 log.info('Received access token from facebook')
             except KeyError:
-                log.error('Did not receive access token from facebook, instead: %s' % response) 
+                log.error('Did not receive access token from facebook, instead: %s' % response)
 
     def data(self):
-        """ Retrieve user data from service.
-        
-        """
+        """ Retrieve user data from service."""
         params = {'access_token': self.access_token}
         url = FACEBOOK_CHECK_AUTH+'?'+urllib.urlencode(params)
         userdata = simplejson.load(urllib.urlopen(url))
