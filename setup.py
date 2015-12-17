@@ -60,6 +60,7 @@ setup(
         'setuptools',
         'simplejson',
     ],
+    test_suite="{0}.tests.test_all".format(name),
     entry_points="""
     # -*- Entry points: -*-
     """,
